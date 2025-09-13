@@ -1,15 +1,17 @@
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Grid, Environment } from '@react-three/drei';
-import { RobotComponent } from './RobotComponent';
+import { RobotArm3DOF } from './RobotArm3DOF';
 import { RobotComponent as RobotComponentType } from '@/types/robotics';
 
 interface Scene3DProps {
   components: RobotComponentType[];
   onSelectComponent: (id: string, shiftPressed: boolean) => void;
   isPlaying: boolean;
+  jointAngles?: [number, number, number];
+  selectedComponents: string[];
 }
 
-export function Scene3D({ components, onSelectComponent, isPlaying }: Scene3DProps) {
+export function Scene3D({ components, onSelectComponent, isPlaying, jointAngles = [0, 0, 0], selectedComponents }: Scene3DProps) {
   return (
     <div className="w-full h-full bg-background border-r border-border">
       <Canvas
@@ -91,15 +93,33 @@ export function Scene3D({ components, onSelectComponent, isPlaying }: Scene3DPro
           </mesh>
         </group>
 
-        {/* Robot Components */}
-        {components.map((component) => (
-          <RobotComponent
-            key={component.id}
-            component={component}
-            onSelect={onSelectComponent}
-            isPlaying={isPlaying}
-          />
-        ))}
+        {/* 3DOF Robotic Arm */}
+        <RobotArm3DOF
+          jointAngles={jointAngles}
+          isPlaying={isPlaying}
+          onSelect={onSelectComponent}
+          selected={selectedComponents.length > 0}
+        />
+
+        {/* Trajectory Visualization */}
+        {isPlaying && (
+          <group>
+            {/* End effector path trace */}
+            <mesh position={[
+              0.6 * Math.cos(jointAngles[0] * Math.PI / 180) + 
+              0.6 * Math.cos((jointAngles[0] + jointAngles[1]) * Math.PI / 180) + 
+              0.6 * Math.cos((jointAngles[0] + jointAngles[1] + jointAngles[2]) * Math.PI / 180),
+              -1 + 0.3 + 
+              0.6 * Math.sin(jointAngles[0] * Math.PI / 180) + 
+              0.6 * Math.sin((jointAngles[0] + jointAngles[1]) * Math.PI / 180) + 
+              0.6 * Math.sin((jointAngles[0] + jointAngles[1] + jointAngles[2]) * Math.PI / 180),
+              0
+            ]}>
+              <sphereGeometry args={[0.02, 8, 6]} />
+              <meshStandardMaterial color="#00ff00" transparent opacity={0.6} />
+            </mesh>
+          </group>
+        )}
 
         {/* Controls */}
         <OrbitControls

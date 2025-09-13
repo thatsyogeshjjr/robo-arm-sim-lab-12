@@ -37,12 +37,16 @@ export interface JointParameters extends ComponentParameters {
   minAngle: number;
   maxAngle: number;
   currentAngle: number;
-  resolution: number;
-  backlash: number;
-  maxAngularVelocity: number;
+  resolution: number; // encoder resolution
+  backlash: number; // degrees or mm
+  maxAngularVelocity: number; // deg/s or mm/s
   staticFriction: number;
   dynamicFriction: number;
   powerTransmission: 'direct' | 'belt' | 'gear' | 'harmonic';
+  stiffness?: number; // Nm/rad or N/mm
+  damping?: number; // Nm⋅s/rad or N⋅s/mm
+  repeatability?: number; // positioning accuracy
+  maxAcceleration?: number; // deg/s² or mm/s²
 }
 
 export interface MotorParameters extends ComponentParameters {
@@ -51,11 +55,16 @@ export interface MotorParameters extends ComponentParameters {
   stallCurrent: number;
   ratedTorque: number;
   stallTorque: number;
-  ratedSpeed: number;
+  ratedSpeed: number; // RPM
   maxSpeed: number;
-  efficiency: number;
+  efficiency: number; // %
   gearRatio: number;
-  heatDissipation: number;
+  heatDissipation: number; // W
+  encoderResolution?: number; // pulses per revolution
+  motorConstant?: number; // Kt in Nm/A
+  backEMFConstant?: number; // Ke in V⋅s/rad
+  thermalTimeConstant?: number; // seconds
+  operatingTemp?: [number, number]; // [min, max] in Celsius
 }
 
 export interface GearboxParameters extends ComponentParameters {
@@ -83,11 +92,17 @@ export interface SensorParameters extends ComponentParameters {
 export interface BatteryParameters extends ComponentParameters {
   chemistry: 'li_ion' | 'lipo' | 'nimh';
   nominalVoltage: number;
-  capacity: number;
+  capacity: number; // mAh
   maxContinuousCurrent: number;
   peakCurrent: number;
-  internalResistance: number;
-  dischargeRate: number;
+  internalResistance: number; // mΩ
+  dischargeRate: number; // C rating
+  cellCount?: number;
+  balanceConnector?: boolean;
+  chargingVoltage?: number;
+  cutoffVoltage?: number;
+  cycleLife?: number;
+  operatingTempRange?: [number, number]; // [min, max] in Celsius
 }
 
 export interface ElectronicsParameters extends ComponentParameters {
