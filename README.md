@@ -1,73 +1,32 @@
-# Welcome to your Lovable project
+# 3DOF Robotic Arm
 
-## Project info
+_explore robotic arms in the comfort of your blankets_
 
-**URL**: https://lovable.dev/projects/e3b65b64-66fc-4f1b-8b0f-0f5dbd562ed6
+## Purpose
 
-## How can I edit this code?
+This project demonstrates the design and development of a three degrees of freedom (3DOF) robotic arm.  
+The primary aim is to provide a low-cost, scalable, and modular prototype for studying robotic kinematics, dynamics, and control.  
+It also serves as an educational tool for understanding concepts such as forward and inverse kinematics, torque requirements, workspace analysis, and actuator selection.
 
-There are several ways of editing your application.
+## Milestones
 
-**Use Lovable**
+- Designed the 3DOF robotic arm structure using CAD tools.
+- Simulated kinematic and dynamic behavior of the arm under varying loads.
+- Integrated end-effector models and considered additional payload conditions.
+- Derived essential equations for torque, angular acceleration, moment of inertia, and power.
+- Prepared the foundation for physical prototyping with accessible materials.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e3b65b64-66fc-4f1b-8b0f-0f5dbd562ed6) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Modeling and Simulation**: Fusion 360, MATLAB/Simulink.
+- **Programming and Control**: Python, C for embedded systems.
+- **Electronics**: Basic actuators, motor drivers, microcontrollers (Arduino/STM32).
+- **Mathematics**: Kinematic equations, torque and power relations, workspace optimization.
 
-**Use your preferred IDE**
+## Future
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e3b65b64-66fc-4f1b-8b0f-0f5dbd562ed6) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- Extend the design to higher degrees of freedom for advanced manipulation tasks.
+- Implement feedback control systems with encoders and sensors.
+- Incorporate computer vision for autonomous object detection and handling.
+- Explore lightweight yet strong material alternatives for increased efficiency.
+- Develop a complete simulation-to-prototype pipeline to accelerate research and education.
