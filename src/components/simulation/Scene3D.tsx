@@ -98,8 +98,63 @@ export function Scene3D({ components, onSelectComponent, isPlaying, jointAngles 
           jointAngles={jointAngles}
           isPlaying={isPlaying}
           onSelect={onSelectComponent}
-          selected={selectedComponents.length > 0}
+          selectedComponents={selectedComponents}
         />
+
+        {/* Additional Components */}
+        {components.map((component) => {
+          // Skip components that are part of the 3DOF arm visual (they're rendered by RobotArm3DOF)
+          if (['base-3dof', 'joint1-3dof', 'joint2-3dof', 'joint3-3dof', 'link1-3dof', 'link2-3dof', 'link3-3dof', 'gripper-3dof'].includes(component.id)) {
+            return null;
+          }
+          
+          const isSelected = selectedComponents.includes(component.id);
+          
+          return (
+            <group key={component.id} position={component.position} rotation={component.rotation}>
+              <mesh
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectComponent(component.id, e.shiftKey);
+                }}
+                onPointerOver={(e) => {
+                  e.stopPropagation();
+                  document.body.style.cursor = 'pointer';
+                }}
+                onPointerOut={() => {
+                  document.body.style.cursor = 'default';
+                }}
+              >
+                {component.parameters.shape === 'sphere' && (
+                  <sphereGeometry args={[component.parameters.dimensions.radius || 0.1, 16, 12]} />
+                )}
+                {component.parameters.shape === 'cylinder' && (
+                  <cylinderGeometry args={[
+                    component.parameters.dimensions.radius || component.parameters.dimensions.width / 2,
+                    component.parameters.dimensions.radius || component.parameters.dimensions.width / 2,
+                    component.parameters.dimensions.height,
+                    16
+                  ]} />
+                )}
+                {component.parameters.shape === 'box' && (
+                  <boxGeometry args={[
+                    component.parameters.dimensions.length,
+                    component.parameters.dimensions.width,
+                    component.parameters.dimensions.height
+                  ]} />
+                )}
+                <meshStandardMaterial 
+                  color={isSelected ? '#fbbf24' : 
+                    component.type === 'battery' ? '#84cc16' : 
+                    component.type === 'motor' ? '#ef4444' :
+                    component.type === 'load' ? '#ec4899' : '#6b7280'}
+                  transparent={isSelected}
+                  opacity={isSelected ? 0.8 : 1}
+                />
+              </mesh>
+            </group>
+          );
+        })}
 
         {/* Trajectory Visualization */}
         {isPlaying && (

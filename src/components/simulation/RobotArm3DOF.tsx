@@ -6,10 +6,10 @@ interface RobotArm3DOFProps {
   jointAngles: [number, number, number];
   isPlaying: boolean;
   onSelect: (id: string, shiftPressed: boolean) => void;
-  selected: boolean;
+  selectedComponents: string[];
 }
 
-export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: RobotArm3DOFProps) {
+export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selectedComponents }: RobotArm3DOFProps) {
   const armRef = useRef<Group>(null);
   const joint1Ref = useRef<Group>(null);
   const joint2Ref = useRef<Group>(null);
@@ -31,17 +31,22 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
     }
   });
 
-  const getComponentColor = (partType: string) => {
-    if (selected) return '#fbbf24';
+  const getComponentColor = (partType: string, componentId: string) => {
+    const isSelected = selectedComponents.includes(componentId);
+    if (isSelected) return '#fbbf24';
     
     switch (partType) {
       case 'base': return '#4b5563';
       case 'link': return '#6b7280';
       case 'joint': return '#f97316';
       case 'gripper': return '#059669';
+      case 'motor': return '#ef4444';
+      case 'battery': return '#84cc16';
       default: return '#6b7280';
     }
   };
+
+  const isComponentSelected = (componentId: string) => selectedComponents.includes(componentId);
 
   return (
     <group ref={armRef} position={[0, -1, 0]}>
@@ -61,9 +66,9 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
       >
         <cylinderGeometry args={[0.3, 0.3, baseHeight, 16]} />
         <meshStandardMaterial 
-          color={getComponentColor('base')} 
-          transparent={selected}
-          opacity={selected ? 0.8 : 1}
+          color={getComponentColor('base', 'base-3dof')} 
+          transparent={isComponentSelected('base-3dof')}
+          opacity={isComponentSelected('base-3dof') ? 0.8 : 1}
         />
       </mesh>
 
@@ -83,7 +88,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
           }}
         >
           <sphereGeometry args={[0.08, 16, 12]} />
-          <meshStandardMaterial color={getComponentColor('joint')} />
+          <meshStandardMaterial 
+            color={getComponentColor('joint', 'joint1-3dof')} 
+            transparent={isComponentSelected('joint1-3dof')}
+            opacity={isComponentSelected('joint1-3dof') ? 0.8 : 1}
+          />
         </mesh>
 
         {/* Link 1 */}
@@ -102,7 +111,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
             }}
           >
             <boxGeometry args={[link1Length, 0.1, 0.1]} />
-            <meshStandardMaterial color={getComponentColor('link')} />
+            <meshStandardMaterial 
+              color={getComponentColor('link', 'link1-3dof')} 
+              transparent={isComponentSelected('link1-3dof')}
+              opacity={isComponentSelected('link1-3dof') ? 0.8 : 1}
+            />
           </mesh>
 
           {/* Joint 2 */}
@@ -121,7 +134,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
               }}
             >
               <sphereGeometry args={[0.08, 16, 12]} />
-              <meshStandardMaterial color={getComponentColor('joint')} />
+              <meshStandardMaterial 
+                color={getComponentColor('joint', 'joint2-3dof')} 
+                transparent={isComponentSelected('joint2-3dof')}
+                opacity={isComponentSelected('joint2-3dof') ? 0.8 : 1}
+              />
             </mesh>
 
             {/* Link 2 */}
@@ -140,7 +157,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
                 }}
               >
                 <boxGeometry args={[link2Length, 0.08, 0.08]} />
-                <meshStandardMaterial color={getComponentColor('link')} />
+                <meshStandardMaterial 
+                  color={getComponentColor('link', 'link2-3dof')} 
+                  transparent={isComponentSelected('link2-3dof')}
+                  opacity={isComponentSelected('link2-3dof') ? 0.8 : 1}
+                />
               </mesh>
 
               {/* Joint 3 */}
@@ -159,7 +180,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
                   }}
                 >
                   <sphereGeometry args={[0.08, 16, 12]} />
-                  <meshStandardMaterial color={getComponentColor('joint')} />
+                  <meshStandardMaterial 
+                    color={getComponentColor('joint', 'joint3-3dof')} 
+                    transparent={isComponentSelected('joint3-3dof')}
+                    opacity={isComponentSelected('joint3-3dof') ? 0.8 : 1}
+                  />
                 </mesh>
 
                 {/* Link 3 / End Effector */}
@@ -178,7 +203,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
                     }}
                   >
                     <boxGeometry args={[link3Length, 0.06, 0.06]} />
-                    <meshStandardMaterial color={getComponentColor('link')} />
+                    <meshStandardMaterial 
+                      color={getComponentColor('link', 'link3-3dof')} 
+                      transparent={isComponentSelected('link3-3dof')}
+                      opacity={isComponentSelected('link3-3dof') ? 0.8 : 1}
+                    />
                   </mesh>
 
                   {/* Gripper */}
@@ -197,7 +226,11 @@ export function RobotArm3DOF({ jointAngles, isPlaying, onSelect, selected }: Rob
                       }}
                     >
                       <boxGeometry args={[0.1, 0.05, 0.1]} />
-                      <meshStandardMaterial color={getComponentColor('gripper')} />
+                      <meshStandardMaterial 
+                        color={getComponentColor('gripper', 'gripper-3dof')} 
+                        transparent={isComponentSelected('gripper-3dof')}
+                        opacity={isComponentSelected('gripper-3dof') ? 0.8 : 1}
+                      />
                     </mesh>
 
                     {/* Payload visualization */}

@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ParameterSlider } from '@/components/ui/parameter-slider';
 import { MechanicalTooltip } from '@/components/ui/mechanical-tooltip';
 import { 
@@ -20,7 +21,11 @@ import {
   AllParameters, 
   JointParameters, 
   MotorParameters, 
-  BatteryParameters
+  BatteryParameters,
+  BaseParameters,
+  LinkParameters,
+  GripperParameters,
+  LoadParameters
 } from '@/types/robotics';
 import { 
   Settings, 
@@ -31,7 +36,9 @@ import {
   Battery,
   Calculator,
   Activity,
-  Gauge
+  Gauge,
+  Box,
+  Package
 } from 'lucide-react';
 
 interface EnhancedDetailsPanelProps {
@@ -66,6 +73,21 @@ export function EnhancedDetailsPanel({
     const updatedParams = {
       ...selectedComponent.parameters,
       [field]: value,
+    };
+    
+    onUpdateComponent(selectedComponent.id, updatedParams);
+  };
+
+  const updateArray = (field: string, index: number, value: number) => {
+    if (!selectedComponent) return;
+    
+    const currentArray = (selectedComponent.parameters as any)[field] as number[];
+    const newArray = [...currentArray];
+    newArray[index] = value;
+    
+    const updatedParams = {
+      ...selectedComponent.parameters,
+      [field]: newArray,
     };
     
     onUpdateComponent(selectedComponent.id, updatedParams);
@@ -330,14 +352,14 @@ export function EnhancedDetailsPanel({
 
             <div>
               <div className="flex items-center gap-1">
-                <Label className="text-xs text-muted-foreground">Operating Temp</Label>
+                <Label className="text-xs text-muted-foreground">Cell Count</Label>
                 <MechanicalTooltip
-                  title="Operating Temperature"
-                  definition="Recommended temperature range for optimal performance and safety."
-                  impact="Temperature affects capacity, internal resistance, and lifespan. Extreme temperatures require thermal management."
+                  title="Battery Cell Count"
+                  definition="Number of individual cells connected in series to achieve desired voltage."
+                  impact="More cells increase voltage but add complexity. Each cell must be monitored for safety and balance."
                 />
               </div>
-              <div className="text-sm font-mono">0-45°C</div>
+              <div className="text-sm font-mono">{params.cellCount || 5}S</div>
             </div>
           </div>
 
@@ -412,11 +434,6 @@ export function EnhancedDetailsPanel({
             <CardTitle className="text-sm flex items-center gap-2">
               <Wrench className="w-4 h-4" />
               Mechanical Properties
-              <MechanicalTooltip
-                title="Mechanical Properties"
-                definition="Fundamental physical characteristics affecting robot dynamics and performance."
-                impact="These parameters determine structural integrity, motion capabilities, and power requirements."
-              />
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -429,26 +446,62 @@ export function EnhancedDetailsPanel({
               unit="kg"
               onChange={(value) => updateParameter('weight', value)}
             />
-            <ParameterSlider
-              label="Max Velocity"
-              value={parameters.maxVelocity}
-              min={0.1}
-              max={10}
-              step={0.1}
-              unit="m/s"
-              onChange={(value) => updateParameter('maxVelocity', value)}
-            />
-            <ParameterSlider
-              label="Max Torque"
-              value={parameters.maxTorque}
-              min={1}
-              max={1000}
-              step={1}
-              unit="Nm"
-              onChange={(value) => updateParameter('maxTorque', value)}
-            />
           </CardContent>
         </Card>
+
+        {/* Component-specific parameters */}
+        {selectedComponent.type === 'motor' && (
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Zap className="w-4 h-4" />
+                Motor Parameters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ParameterSlider
+                label="Rated Torque"
+                value={(parameters as MotorParameters).ratedTorque}
+                min={0.1}
+                max={100}
+                step={0.1}
+                unit="Nm"
+                onChange={(value) => updateParameter('ratedTorque', value)}
+              />
+              <ParameterSlider
+                label="Rated Speed"
+                value={(parameters as MotorParameters).ratedSpeed}
+                min={100}
+                max={10000}
+                step={100}
+                unit="RPM"
+                onChange={(value) => updateParameter('ratedSpeed', value)}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        {selectedComponent.type === 'joint' && (
+          <Card className="border-border">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Cog className="w-4 h-4" />
+                Joint Parameters
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <ParameterSlider
+                label="Current Angle"
+                value={(parameters as JointParameters).currentAngle}
+                min={(parameters as JointParameters).minAngle}
+                max={(parameters as JointParameters).maxAngle}
+                step={1}
+                unit="°"
+                onChange={(value) => updateParameter('currentAngle', value)}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
     );
   };
@@ -461,7 +514,7 @@ export function EnhancedDetailsPanel({
       <SidebarHeader className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <h2 className="text-lg font-semibold">Enhanced Analysis</h2>
+            <h2 className="text-lg font-semibold">Component Details</h2>
           )}
           <Button
             variant="ghost"
