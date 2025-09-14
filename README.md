@@ -4,29 +4,30 @@ _explore robotic arms in the comfort of your blankets_
 
 ## Purpose
 
-This project demonstrates the design and development of a three degrees of freedom (3DOF) robotic arm.  
-The primary aim is to provide a low-cost, scalable, and modular prototype for studying robotic kinematics, dynamics, and control.  
-It also serves as an educational tool for understanding concepts such as forward and inverse kinematics, torque requirements, workspace analysis, and actuator selection.
+This project provides an interactive browser-based environment to explore the basic structure and troubleshooting processes of a 3DOF robotic arm. The objective is to simulate common scenarios encountered in robotics education, enabling users to practice system-level reasoning without access to physical hardware.
 
 ## Milestones
 
-- Designed the 3DOF robotic arm structure using CAD tools.
-- Simulated kinematic and dynamic behavior of the arm under varying loads.
-- Integrated end-effector models and considered additional payload conditions.
-- Derived essential equations for torque, angular acceleration, moment of inertia, and power.
-- Prepared the foundation for physical prototyping with accessible materials.
+- [x] Basic 3D rendering of robotic arm components (base, links, joints, end effector).
+- [x] Labeling and interactive visualization of components.
+- [ ] Integration of guided missions with defined fault conditions and corrective actions.
+- [ ] Implementation of a telemetry panel displaying sensor-like readouts (torque, current, temperature).
+- [ ] Rule-based logic to simulate realistic cause-effect interactions (friction, torque limits, overheating).
+- [ ] Exportable artifacts such as PDF logs and performance summaries.
 
 ## Tech Stack
 
-- **Modeling and Simulation**: Fusion 360, MATLAB/Simulink.
-- **Programming and Control**: Python, C for embedded systems.
-- **Electronics**: Basic actuators, motor drivers, microcontrollers (Arduino/STM32).
-- **Mathematics**: Kinematic equations, torque and power relations, workspace optimization.
+- **Frontend:** React, Tailwind CSS
+- **3D Rendering:** three.js (WebGL)
+- **Physics/Logic:** Rule-based simulation engine (custom JavaScript)
+- **Circuit Simulation:** CircuitJS integration or simplified wiring logic
+- **Backend:** Firebase or Node.js (authentication, persistence, leaderboards)
+- **Export Tools:** jsPDF (PDF generation), Canvas capture utilities
 
 ## Future
 
-- Extend the design to higher degrees of freedom for advanced manipulation tasks.
-- Implement feedback control systems with encoders and sensors.
-- Incorporate computer vision for autonomous object detection and handling.
-- Explore lightweight yet strong material alternatives for increased efficiency.
-- Develop a complete simulation-to-prototype pipeline to accelerate research and education.
+- Development of additional missions covering diverse robotic faults and scenarios.
+- Instructor dashboard for monitoring, grading, and mission authoring.
+- Expansion beyond robotic arms to drones, mobile robots, and industrial automation contexts.
+- Integration of hardware input devices (e.g., rotary encoders, tactile controllers) for enhanced realism.
+- Refinement of physics models for greater accuracy while maintaining browser performance.

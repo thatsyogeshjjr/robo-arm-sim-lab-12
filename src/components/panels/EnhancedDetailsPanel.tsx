@@ -1,9 +1,18 @@
 import { useState } from 'react';
-import { 
-  Sidebar, 
-  SidebarContent, 
-  SidebarGroup, 
-  SidebarGroupContent, 
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel
+} from '@/components/ui/alert-dialog';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
   SidebarGroupLabel,
   SidebarHeader,
   useSidebar
@@ -66,15 +75,42 @@ export function EnhancedDetailsPanel({
   physicsState
 }: EnhancedDetailsPanelProps) {
   const selectedComponent = selectedComponents[0] || null;
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
   const updateParameter = (field: string, value: any) => {
     if (!selectedComponent) return;
-    
     const updatedParams = {
       ...selectedComponent.parameters,
       [field]: value,
     };
-    
+    // Check for problematic values
+    if (selectedComponent.type === 'joint') {
+      const maxTorque = (updatedParams as JointParameters).maxTorque || 15;
+      const jointIndex = selectedComponent.id.includes('joint1') ? 0 : selectedComponent.id.includes('joint2') ? 1 : 2;
+      const jointPhysics = physicsState?.joints[jointIndex];
+      if (jointPhysics && jointPhysics.torque > maxTorque) {
+        setWarningMessage(`Torque requirement (${jointPhysics.torque.toFixed(2)} Nm) exceeds joint's max torque (${maxTorque} Nm). Reduce payload or adjust configuration.`);
+        setShowWarning(true);
+      }
+    }
+    if (selectedComponent.type === 'motor') {
+      const ratedTorque = (updatedParams as MotorParameters).ratedTorque || 15;
+      const jointIndex = selectedComponent.id.includes('motor1') ? 0 : selectedComponent.id.includes('motor2') ? 1 : 2;
+      const jointPhysics = physicsState?.joints[jointIndex];
+      if (jointPhysics && jointPhysics.torque > ratedTorque) {
+        setWarningMessage(`Required torque (${jointPhysics.torque.toFixed(2)} Nm) exceeds motor's rated torque (${ratedTorque} Nm). Consider upgrading motor or reducing load.`);
+        setShowWarning(true);
+      }
+    }
+    if (selectedComponent.type === 'load') {
+      const payloadCapacity = physicsState?.payloadCapacity || 5;
+      const mass = (updatedParams as LoadParameters).mass || 5;
+      if (mass > payloadCapacity) {
+        setWarningMessage(`Payload mass (${mass} kg) exceeds current capacity (${payloadCapacity.toFixed(1)} kg). Reduce payload or improve arm configuration.`);
+        setShowWarning(true);
+      }
+    }
     onUpdateComponent(selectedComponent.id, updatedParams);
   };
 
@@ -402,7 +438,7 @@ export function EnhancedDetailsPanel({
       );
     }
 
-    const { parameters } = selectedComponent;
+    const parameters = selectedComponent.parameters;
 
     return (
       <div className="space-y-4">
@@ -507,33 +543,49 @@ export function EnhancedDetailsPanel({
   };
 
   return (
-    <Sidebar 
-      className={`border-l border-border transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-96'}`}
-      side="right"
-    >
-      <SidebarHeader className="p-4 border-b border-border">
-        <div className="flex items-center justify-between">
-          {!isCollapsed && (
-            <h2 className="text-lg font-semibold">Component Details</h2>
-          )}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onToggleCollapse}
-            className="h-8 w-8 p-0"
-          >
-            <ChevronLeft className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
-          </Button>
-        </div>
-      </SidebarHeader>
+    <>
+      <Sidebar 
+        className={`border-l border-border transition-all duration-300 ${isCollapsed ? 'w-12' : 'w-96'}`}
+        side="right"
+      >
+        <SidebarHeader className="p-4 border-b border-border">
+          <div className="flex items-center justify-between">
+            {!isCollapsed && (
+              <h2 className="text-lg font-semibold">Component Details</h2>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onToggleCollapse}
+              className="h-8 w-8 p-0"
+            >
+              <ChevronLeft className={`w-4 h-4 transition-transform ${isCollapsed ? 'rotate-180' : ''}`} />
+            </Button>
+          </div>
+        </SidebarHeader>
 
-      <SidebarContent className={isCollapsed ? 'hidden' : ''}>
-        <SidebarGroup>
-          <SidebarGroupContent className="px-4 py-4">
-            {renderParameterControls()}
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-    </Sidebar>
+        <SidebarContent className={isCollapsed ? 'hidden' : ''}>
+          <SidebarGroup>
+            <SidebarGroupContent className="px-4 py-4">
+              {renderParameterControls()}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+      </Sidebar>
+      {/* Warning Modal */}
+      {showWarning && (
+        <AlertDialog open={showWarning} onOpenChange={setShowWarning}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Warning: Unsafe Value</AlertDialogTitle>
+              <AlertDialogDescription>{warningMessage}</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={() => setShowWarning(false)}>Close</AlertDialogCancel>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+    </>
   );
 }

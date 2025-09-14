@@ -598,11 +598,24 @@ export function RobotSimulation() {
   }, []);
 
   const handleUpdateComponent = useCallback((id: string, parameters: AllParameters) => {
-    setSimulationState(prev => ({
-      ...prev,
-      components: updateComponentInTree(prev.components, id, { parameters }),
-    }));
-  }, [updateComponentInTree]);
+    setSimulationState(prev => {
+      const updatedComponents = updateComponentInTree(prev.components, id, { parameters });
+      // Find joint angles from updated components
+      const jointAngles = updatedComponents
+        .filter(c => c.type === 'joint')
+        .map(c => (c.parameters as JointParameters).currentAngle);
+      // Update physics immediately
+      updatePhysics([
+        jointAngles[0] || 0,
+        jointAngles[1] || 0,
+        jointAngles[2] || 0
+      ]);
+      return {
+        ...prev,
+        components: updatedComponents,
+      };
+    });
+  }, [updateComponentInTree, updatePhysics]);
 
   const handleAddComponent = useCallback((type: 'base' | 'link' | 'joint' | 'motor' | 'gearbox' | 'gripper' | 'sensor' | 'battery' | 'electronics' | 'load', position: 'top' | 'bottom') => {
     const getDefaultParameters = () => {
